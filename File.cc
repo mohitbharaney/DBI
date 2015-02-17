@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#define F_DEBUG
+
+
 
 Page :: Page () {
 	curSizeInBytes = sizeof (int);
