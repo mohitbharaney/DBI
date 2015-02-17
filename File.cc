@@ -7,9 +7,9 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
+#include <unistd.h>
+#define F_DEBUG
 
 Page :: Page () {
 	curSizeInBytes = sizeof (int);
@@ -282,6 +282,5 @@ int File :: Close () {
 	return curLength;
 	
 }
-
 
 

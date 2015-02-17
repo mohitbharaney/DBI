@@ -64,7 +64,7 @@ int main()
 	 * test create function of DBfile
 	 */
 		DBFile dbfile;
-//		dbfile.Create("db.bin",heap,NULL);
+		dbfile.Create("db.bin",heap,NULL);
 		
 		/*
 		 * test open function of dbfile
@@ -73,18 +73,21 @@ int main()
 		 dbfile.Open("db.bin");
 		 printf("finished opening file\n------------------------------------------------------------------------");
 		 Schema mySchema ("catalog", "lineitem");
-//		dbfile.Load(mySchema,"/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl");
+		dbfile.Load(mySchema,"./10M/lineitem.tbl");
 		Record temp;
-		FILE *tableFile = fopen ("/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl", "r");
-//		if(temp.SuckNextRecord (&mySchema, tableFile) == 1)
-//		{
-//			dbfile.Add(temp);
-//		}
-//		else
-//		cout<<"file not read"<<endl;
+		FILE *tableFile = fopen ("./10M/lineitem.tbl", "r");
+		if(temp.SuckNextRecord (&mySchema, tableFile) == 1)
+		{
+			dbfile.Add(temp);
+		}
+		else
+		cout<<"file not read"<<endl;
+
 
 		Page test;
-		dbfile.GetNext(temp);		
+		int x=dbfile.GetNext(temp);	
+		cout<<"get record return value    "<<x<<endl;	
+		if(x)
 		temp.Print(&mySchema);
 		dbfile.Close();
 		

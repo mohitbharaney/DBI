@@ -7,7 +7,6 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 
- 
 class Record;
 
 using namespace std;

@@ -13,9 +13,6 @@ struct Attribute {
 
 	char *name;
 	Type myType;
-	~Attribute(){
-		delete[] name;
-	}
 };
 
 class OrderMaker;

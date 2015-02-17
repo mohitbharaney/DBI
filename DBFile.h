@@ -7,24 +7,23 @@
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
-#include <iostream>
-#include <fstream>
 
 typedef enum {heap, sorted, tree} fType;
 
 // stub DBFile header..replace it with your own DBFile.h 
 
 class DBFile {
-File dbFile;				//file descriptor for file on disk
-Page *writeBuffer;				//declare read write buffer
-Page *readBuffer;
-int writePage,readPage,readRecord;	//metadata of file to keep track of the file.
-fType file_type;						//to be used later
-char* metaDataFileName="metaData.txt";
-		
+
+	int readPage,writePage,readRecord;
+	int flag;
+	Page *rwBuffer;
+	File dbFile;
+//	char *metaDataFileName;
+	char metaDataFileName[40];
+	ComparisonEngine compEngine;
 public:
 	DBFile (); 
-	~DBFile();
+
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);
 	int Close ();
@@ -35,6 +34,7 @@ public:
 	void Add (Record &addme);
 	int GetNext (Record &fetchme);
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
+	~DBFile();
 
 };
 #endif
