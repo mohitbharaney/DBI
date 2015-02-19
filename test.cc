@@ -48,7 +48,9 @@ void *consumer (void *arg) {
 	Record rec[2];
 	Record *last = NULL, *prev = NULL;
 
+	cout<<"consumer before while"<<endl;
 	while (t->pipe->Remove (&rec[i%2])) {
+		cout<<"gonna exit here mostly"<<endl;
 		prev = last;
 		last = &rec[i%2];
 

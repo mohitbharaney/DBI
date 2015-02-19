@@ -5,10 +5,15 @@
 #include "Pipe.h"
 #include "File.h"
 #include "Record.h"
+#include <vector>
+
 
 using namespace std;
 
+//ComparisonEngine comparisonEngine;
+
 class BigQ {
+
 
 public:
 

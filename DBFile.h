@@ -20,7 +20,7 @@ class DBFile {
 	File dbFile;
 //	char *metaDataFileName;
 	char metaDataFileName[40];
-	ComparisonEngine compEngine;
+
 public:
 	DBFile (); 
 

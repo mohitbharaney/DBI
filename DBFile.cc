@@ -283,6 +283,7 @@ DBFile::GetNext (Record & fetchme, CNF & cnf, Record & literal)
 {
   int cnt = 0;
   Schema x ("catalog", "nation");
+  ComparisonEngine compEngine;
   while (GetNext (fetchme))
     {
       //fetchme.Print(&x);
