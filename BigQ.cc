@@ -8,7 +8,7 @@ OrderMaker globalSortOrder;
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength, File &phase1);
 
 bool sortFunc(Record* left, Record* right) {
-	cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
+	//cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
 	if (compEngine.Compare(left, right, &globalSortOrder) < 0)
 		return true;
 
@@ -91,10 +91,10 @@ void* work(void* arguments) {
 			toSort.push_back(t2);
 
 	}
-	cout<<"/n vecote size is "<<toSort.size()<<endl;
+	//cout<<"/n vecote size is "<<toSort.size()<<endl;
 	if(!toSort.empty())
 	{
-		cout<<"going in for the kill"<<endl;
+	//	cout<<"going in for the kill"<<endl;
 		writeToFile(toSort,noOfRuns,runlen,phase1);
 		count = 0;
 		noOfRuns++;
@@ -113,7 +113,7 @@ void* work(void* arguments) {
 	while(test->GetFirst(&t))
 		out->Insert(&t);
 
-	cout<<"runlength is"<<runlen<<endl<<endl;
+	//cout<<"runlength is"<<runlen<<endl<<endl;
 
 //	Record temp;
 //	in->Remove(&temp);
@@ -157,19 +157,19 @@ BigQ::~BigQ() {
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength, File &phase1) {
 	Schema mySchema ("catalog", "nation");
-	cout<<"i think i know whats fucking things up"<<endl;
 
-	data[0]->Print(&mySchema);
-	cout<<endl;
-	data[1]->Print(&mySchema);
-	cout<<endl;
-	data[24]->Print(&mySchema);
-	cout<<endl;
+
+//	data[0]->Print(&mySchema);
+//	cout<<endl;
+//	data[1]->Print(&mySchema);
+//	cout<<endl;
+//	data[24]->Print(&mySchema);
+//	cout<<endl;
 
 
 
 	sort(data.begin(), data.begin()+data.size(), sortFunc);					//sort the vector based on the custom function
-	cout<<"sort successful fuck yeah"<<endl;
+
 	Record *temp=new Record();																//temp rec
 	Page* output = new Page();													//output buffer
 	bool flag;																	//flag to check after the while loop,if the entire vecotrs written to the temp file
