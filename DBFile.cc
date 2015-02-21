@@ -68,7 +68,7 @@ re initialize the md file on create
 }
 
 /** Open the filepath provided by loadpath.
-*IF Loop through records in the file and load it into the temp 	record variable
+*while Loop through records in the file and load it into the temp record variable
 * Keep appending it to a page and when the page is full write this page out 
 * to the disk using an instance of file class. Clear the page buffer for further
 * loads
