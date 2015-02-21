@@ -50,7 +50,7 @@ void *consumer (void *arg) {
 
 	cout<<"consumer before while"<<endl;
 	while (t->pipe->Remove (&rec[i%2])) {
-		cout<<"gonna exit here mostly"<<endl;
+		//cout<<"gonna exit here mostly"<<endl;
 		prev = last;
 		last = &rec[i%2];
 
