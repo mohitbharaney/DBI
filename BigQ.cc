@@ -152,6 +152,7 @@ BigQ::BigQ(Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 }
 
 BigQ::~BigQ() {
+
 }
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength, File &phase1) {
