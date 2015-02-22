@@ -56,13 +56,11 @@ void* work(void* arguments) {
 		if (!input->Append(temp)) {							//add to input buffer, if fails go into if
 			count++;											//increases the pageCount
 			Record* t1=new Record();
-			//Record t1;
 			while (input->GetFirst(t1))						//dump the page to vector
 			{
 				copyRec=new Record();
 				copyRec->Copy(t1);
 				toSort.push_back(copyRec);
-
 			}
 
 			if (count == runlen) {
@@ -72,14 +70,10 @@ void* work(void* arguments) {
 			}
 			input->Append(temp);
 		}
-//		cout<<"critical test here"<<endl;
-//		Record t1;
-//		input->GetFirst(&t1);
-//		toSort.push_back(t1);
-//
+
 	}
 
-//	cout<<"/n vecote size is "<<toSort.size()<<endl;
+
 	Record *t1=new Record();
 	Record *t2;
 	Schema mySchema ("catalog", "nation");//temp record again
@@ -91,7 +85,7 @@ void* work(void* arguments) {
 			toSort.push_back(t2);
 
 	}
-	//cout<<"/n vecote size is "<<toSort.size()<<endl;
+
 	if(!toSort.empty())
 	{
 	//	cout<<"going in for the kill"<<endl;
@@ -99,6 +93,9 @@ void* work(void* arguments) {
 		count = 0;
 		noOfRuns++;
 	}
+
+
+	cout<<"total no of runs are "<<noOfRuns<<endl;
 
 ///*
 // *
@@ -178,8 +175,8 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength, File &phase1
 	while (count<data.size()) {													//run the loop till the entire vectors been traversed
 		flag = true;															//set the flag true in the loop
 		temp ->Copy(data[count]);		//retrive the record in temp
-		temp->Print(&mySchema);
-		cout<<endl;
+		//temp->Print(&mySchema);
+		//cout<<endl;
 		if (!output->Append(temp)) {											//if the output buffer is full
 			int offset = noOfRun * runLength + outCount;						//calculate the offset at which the record is to be put
 			phase1.AddPage(output, offset);										//add page to the file
