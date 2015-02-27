@@ -7,6 +7,7 @@ OrderMaker globalSortOrder;
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		File &phase1);
+void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe);
 
 bool sortFunc(Record* left, Record* right) {
 	//cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
@@ -98,8 +99,9 @@ void* work(void* arguments) {
 		noOfRuns++;
 	}
 
+	//cout << "total no of runs are " << noOfRuns << endl;
 	phase1.Close();
-	cout << "total no of runs are " << noOfRuns << endl;
+	mergeRuns(runlen, noOfRuns, "phase1.bin", out);
 
 ///*
 // *
@@ -107,20 +109,18 @@ void* work(void* arguments) {
 // *
 // */
 //
-	Page *test = new Page();
-	phase1.GetPage(test, 1);
-	Record t;
-	//Schema mySchema ("catalog", "nation");
-	while (test->GetFirst(&t))
-		out->Insert(&t);
+	/*	Page *test = new Page();
+	 phase1.GetPage(test, 1);
+	 Record t;
+	 //Schema mySchema ("catalog", "nation");
+	 while (test->GetFirst(&t))
+	 out->Insert(&t); */
 
 	//cout<<"runlength is"<<runlen<<endl<<endl;
-
 //	Record temp;
 //	in->Remove(&temp);
 //	Schema mySchema ("catalog", "nation");
 //	temp.Print(&mySchema);
-
 }
 
 /*
@@ -159,6 +159,7 @@ BigQ::~BigQ() {
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		File &phase1) {
 	Schema mySchema("catalog", "nation");
+	//cout<<"in write to file"<<endl;
 
 //	data[0]->Print(&mySchema);
 //	cout<<endl;
@@ -198,4 +199,104 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 	data.clear();				//empty out the vector.
 	delete output;
 	//delete temp;
+}
+
+void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
+
+	File tempFile;
+	tempFile.Open(1, f_path);
+	vector<Page *> pageVector; // it will store the first page
+	vector<Record *> recordVector; // it will store the 1st record of 1st page
+	//cout << "total run" << totalrun << endl;
+	int fileLegth = tempFile.GetLength() - 1;
+//	cout << "file length" << fileLegth << endl;
+
+	if (totalrun == 1) {
+
+		//cout<<"file length"<<fileLegth<<endl;
+
+		for (int i = 1; i < fileLegth; i++) {
+			Page *page = new Page();
+		//	cout << "value of i ==" << i << endl;
+			tempFile.GetPage(page, i);
+			Record *tempRecord = new Record();
+
+			while (page->GetFirst(tempRecord)) {
+				outPipe->Insert(tempRecord);
+			}
+		}
+	} else {
+		Page *newPage;
+		int indiPageCount[totalrun];
+		for (int k = 0; k < totalrun; k++) {
+			indiPageCount[k] = 1; // individual page number for each run
+		}
+		for (int j = 1; j < fileLegth;) /// check fileLength while testing
+				{
+			newPage = new Page();
+			tempFile.GetPage(newPage, j);
+			pageVector.push_back(newPage);
+			j = j + runLength;
+
+		}
+		Record *temprecord = new Record();
+		Record *copyrecord;
+
+		for (int j = 0; j < pageVector.size(); j++) {
+			copyrecord = new Record();
+			pageVector[j]->GetFirst(temprecord);
+			copyrecord->Copy(temprecord);
+			recordVector.push_back(copyrecord);
+
+		}
+		int nullCounter = 0;
+		Record *tmpRecord = new Record();
+		Record *copyRecord;
+		while (true) {
+			int minIndex = min_element(recordVector.begin(), recordVector.end(),
+					sortFunc) - recordVector.begin();
+			outPipe->Insert(recordVector[minIndex]);
+			copyRecord = new Record();
+			if (!pageVector[minIndex]->GetFirst(tmpRecord)) {
+				int countCheck = 0;
+				if (minIndex == totalrun - 1) {
+
+					countCheck = fileLegth-((minIndex * runLength) + 1);
+				} else {
+					countCheck = runLength;
+				}
+				indiPageCount[minIndex] += 1;
+				//cout<<"countcheck"<< countCheck<<"min index"<<minIndex<<endl;
+				//cout<<"run length"<<runLength<<endl;
+
+
+				if (indiPageCount[minIndex] <= countCheck) {
+					int offset = (minIndex * runLength) + indiPageCount[minIndex];
+					//cout<<"offset value"<<offset<<"indiPageCount["<<minIndex<<"]"<<indiPageCount[minIndex]<<endl;
+					tempFile.GetPage(pageVector[minIndex], offset);
+					pageVector[minIndex]->GetFirst(tmpRecord);
+					copyRecord->Copy(tmpRecord);
+					recordVector[minIndex] = copyRecord;
+				}
+				else
+				{
+					recordVector[minIndex]=NULL;
+					nullCounter++;
+				}
+
+			} else {
+				copyRecord->Copy(tmpRecord);
+				recordVector[minIndex] = copyRecord;
+			}
+
+			if (nullCounter == runLength)
+				break;
+		}
+
+//		for (int i = 0; i < recordVector.size(); i++) {
+//			Schema s("catalog", "lineitem");
+//			cout << "printing recorsss---------" << endl;
+//			recordVector[i]->Print(&s);
+//		}
+	}
 }
