@@ -187,7 +187,7 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 			output->Append(temp);//add the last record that triggered the if condition to the output buffer
 			outCount++;							//ouput page count goes up by 1
 
-			flag = false;	//set flag to false as the entire pages is written
+			flag = true;	//set flag to false as the entire pages is written
 		}
 		count++;					//increment the count in vector traversal
 	}
@@ -295,7 +295,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 				recordVector[minIndex] = copyRecord;
 			}
 
-			if (nullCounter == runLength)
+			if (nullCounter == totalrun)
 				break;
 		}
 
