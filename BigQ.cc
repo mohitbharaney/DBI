@@ -196,6 +196,9 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		phase1.AddPage(output, offset);
 		output->EmptyItOut();
 	}
+	for(int i=0;i<data.size();i++)
+		delete data[i];
+
 	data.clear();				//empty out the vector.
 	delete output;
 	//delete temp;
@@ -224,6 +227,8 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 			while (page->GetFirst(tempRecord)) {
 				outPipe->Insert(tempRecord);
 			}
+			delete tempRecord;
+			delete page;
 		}
 	} else {
 		Page *newPage;
@@ -256,6 +261,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 			int minIndex = min_element(recordVector.begin(), recordVector.end(),
 					sortFunc) - recordVector.begin();
 			outPipe->Insert(recordVector[minIndex]);
+			delete recordVector[minIndex];
 			copyRecord = new Record();
 			if (!pageVector[minIndex]->GetFirst(tmpRecord)) {
 				int countCheck = 0;
@@ -299,4 +305,8 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 //			recordVector[i]->Print(&s);
 //		}
 	}
+
+	for(int i=0;i<pageVector.size();i++)
+		delete pageVector[i];
+
 }
