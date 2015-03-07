@@ -43,6 +43,7 @@ void* work(void* arguments) {
 	struct args* para;					//args struc to receive arguments
 	para = (struct args*) arguments;
 
+
 	Pipe* in = para->in;	//pointer to the parameters , needed for tpmms algo
 	Pipe* out = para->out;	//pointer to the parameters , needed for tpmms algo
 	OrderMaker* sortorder = para->sortorder;//pointer to the parameters , needed for tpmms algo
