@@ -6,7 +6,7 @@ ComparisonEngine compEngine;
 OrderMaker globalSortOrder;
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
-		File &phase1);
+		File &phase1,int& offset);
 void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe);
 
 bool sortFunc(Record* left, Record* right) {
@@ -47,7 +47,7 @@ void* work(void* arguments) {
 	Pipe* out = para->out;	//pointer to the parameters , needed for tpmms algo
 	OrderMaker* sortorder = para->sortorder;//pointer to the parameters , needed for tpmms algo
 	int runlen = para->runlen;//pointer to the parameters , needed for tpmms algo
-
+	int offset=1;
 	int count = 0;
 	Record* temp = new Record();
 	Record* copyRec;
@@ -72,7 +72,7 @@ void* work(void* arguments) {
 			}
 
 			if (count == runlen) {
-				writeToFile(toSort, noOfRuns, runlen, phase1);
+				writeToFile(toSort, noOfRuns, runlen, phase1,offset);
 				count = 0;
 				noOfRuns++;
 			}
@@ -94,7 +94,7 @@ void* work(void* arguments) {
 
 	if (!toSort.empty()) {
 		//	cout<<"going in for the kill"<<endl;
-		writeToFile(toSort, noOfRuns, runlen, phase1);
+		writeToFile(toSort, noOfRuns, runlen, phase1,offset);
 		count = 0;
 		noOfRuns++;
 	}
@@ -149,7 +149,7 @@ BigQ::BigQ(Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 
 	// finally shut down the out pipe
 	pthread_join(worker, NULL);
-	out.ShutDown();
+	//out.ShutDown();
 }
 
 BigQ::~BigQ() {
@@ -157,7 +157,7 @@ BigQ::~BigQ() {
 }
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
-		File &phase1) {
+		File &phase1,int& offset) {
 	Schema mySchema("catalog", "nation");
 	//cout<<"in write to file"<<endl;
 
@@ -181,19 +181,20 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		//temp->Print(&mySchema);
 		//cout<<endl;
 		if (!output->Append(temp)) {			//if the output buffer is full
-			int offset = noOfRun * runLength + outCount;//calculate the offset at which the record is to be put
+			//int offset = noOfRun * runLength + outCount;//calculate the offset at which the record is to be put
 			phase1.AddPage(output, offset);				//add page to the file
 			output->EmptyItOut();							//empty the buffer
 			output->Append(temp);//add the last record that triggered the if condition to the output buffer
-			outCount++;							//ouput page count goes up by 1
+			offset++;
 
 			flag = true;	//set flag to false as the entire pages is written
 		}
 		count++;					//increment the count in vector traversal
 	}
 	if (flag) {	//if the while loop exits with flag=true it implies that the vector was not of exact page size, henc the last page still needs to be written to the file
-		int offset = noOfRun * runLength + outCount;//following code is to handle the above case
+
 		phase1.AddPage(output, offset);
+		offset++;
 		output->EmptyItOut();
 	}
 	for(int i=0;i<data.size();i++)
@@ -299,14 +300,12 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 				break;
 		}
 
-//		for (int i = 0; i < recordVector.size(); i++) {
-//			Schema s("catalog", "lineitem");
-//			cout << "printing recorsss---------" << endl;
-//			recordVector[i]->Print(&s);
-//		}
+
 	}
 
 	for(int i=0;i<pageVector.size();i++)
 		delete pageVector[i];
+
+	outPipe->ShutDown();
 
 }
