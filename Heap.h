@@ -1,5 +1,5 @@
-#ifndef DBFILE_H
-#define DBFILE_H
+#ifndef HEAP_H
+#define HEAP_H
 
 #include "TwoWayList.h"
 #include "Record.h"
@@ -8,24 +8,21 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include "GenericDB.h"
-#include "Heap.h"
 
 //typedef enum {heap, sorted, tree} fType;
 
 // stub DBFile header..replace it with your own DBFile.h 
 
-class DBFile {
+class Heap : public  GenericDB{
 
-//	int readPage,writePage,readRecord;
-//	int flag;
-//	Page *rwBuffer;
-//	File dbFile;
-////	char *metaDataFileName;
+	int readPage,writePage,readRecord;
+	int flag;
+	Page *rwBuffer;
+	File dbFile;
 	char metaDataFileName[40];
 
-
 public:
-	DBFile (); 
+	Heap ();
 
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);
@@ -37,7 +34,7 @@ public:
 	void Add (Record &addme);
 	int GetNext (Record &fetchme);
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
-	~DBFile();
+	~Heap();
 
 };
 #endif

@@ -9,6 +9,7 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		File &phase1,int& offset);
 void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe);
 
+
 bool sortFunc(Record* left, Record* right) {
 	//cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
 	if (left == NULL && right == NULL)

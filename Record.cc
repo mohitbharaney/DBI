@@ -2,25 +2,12 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <iostream>
-
+#include<stdlib.h>
 
 Record :: Record () {
 	bits = NULL;
 }
-
-//Record::Record(const Record& b1){
-//	delete [] bits;
-//		bits = new (std::nothrow) char[((int *) b1.bits)[0]];
-//		if (bits == NULL)
-//		{
-//			cout << "ERROR : Not enough memory. EXIT !!!\n";
-//			exit(1);
-//		}
-//
-//		memcpy (bits, b1.bits, ((int *) b1.bits)[0]);
-//}
 
 Record :: ~Record () {
 	if (bits != NULL) {

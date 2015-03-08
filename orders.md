@@ -1,3 +1,3 @@
-readPage 1
-readRecord 0
+readPage 19
+readRecord 95
 writePage 19

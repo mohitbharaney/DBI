@@ -1,3 +1,3 @@
 readPage 1
-readRecord 0
+readRecord 5
 writePage 1

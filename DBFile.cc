@@ -10,14 +10,15 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
-
+#include "Heap.h"
+#include "GenericDB.h"
 // stub file .. replace it with your own DBFile.cc
+
+GenericDB *genericFile;
 
 DBFile::DBFile ()
 {
-  //metaDataFileName = "metaData.txt";
-  flag = -1;
-  rwBuffer = new Page ();
+
 }
 
 /*
@@ -27,44 +28,22 @@ DBFile::DBFile ()
 int
 DBFile::Create (char *f_path, fType f_type, void *startup)
 {
-  if (f_path != NULL)
-    {
+		if(f_type==heap)
+		{
+			genericFile=new Heap();
 
+		}
 
-	string fileName(f_path);
-	fileName=fileName.substr(0,fileName.length()-3);
-	fileName=fileName+"md";
+		if(genericFile!=NULL)
+			return genericFile->Create(f_path,f_type,startup);
 
-strcpy(&metaDataFileName[0],&fileName[0]);
+		else
+		{
+			cout<<"could not create the file";
+					exit(1);
+		}
 
-
-/*
-extract file name and convert it to fileName.md for the metaData file
-
-*/
-
-
-	 ofstream mdFile;
-  mdFile.open (metaDataFileName);
-  mdFile << "readPage " << 1 << endl;
-  mdFile << "readRecord " << 0 << endl;
-  mdFile << "writePage " << 1 << endl;
-  mdFile.close ();
-
-/*
-re initialize the md file on create
-*/
-
-
-
-      dbFile.Open (0, f_path);
-      dbFile.AddPage (rwBuffer, 0);
-      dbFile.Close ();
-      Open (f_path);
-      return 1;
-    }
-  else
-    return 0;
+    return 1;
 }
 
 /** Open the filepath provided by loadpath.
@@ -76,41 +55,7 @@ re initialize the md file on create
 void
 DBFile::Load (Schema & f_schema, char *loadpath)
 {
-
-//  cout << loadpath << endl;
-  FILE *tableFile = fopen (loadpath, "r");
-  int count = 0;
-  Record temp;
-
-//cout<<"write page in load -------------------------- "<<writePage<<endl;
-  if (tableFile != NULL)
-    {
-      while (temp.SuckNextRecord (&f_schema, tableFile) == 1)
-	{
-
-
-	  //cout<<"inside while"<<endl;
-/*	  if (!rwBuffer->Append (&temp))
-	    {
-	      dbFile.AddPage (rwBuffer, writePage);
-	      writePage++;
-	      rwBuffer->EmptyItOut ();
-	      rwBuffer->Append (&temp);
-	      cout << writePage << endl;
-	    }
-	  count++;
-*/
-
-
-		Add(temp);
-	}
-      dbFile.AddPage (rwBuffer, writePage);
-      flag = 1;
-//cout<<"write page in load -------------------------- "<<writePage<<endl;
-      fclose (tableFile);
-    }
-  else
-    cout << "check yout loadPath" << endl;
+	genericFile->Load(f_schema,loadpath);
 }
 
 /**
@@ -124,7 +69,7 @@ DBFile::Open (char *f_path)
 
   if (f_path != NULL)
     {
-      dbFile.Open (1, f_path);	//first parameter is non zero so that files not created again and is opened in read write mode.
+    //  dbFile.Open (1, f_path);	//first parameter is non zero so that files not created again and is opened in read write mode.
 
 	string fileName(f_path);
 	fileName=fileName.substr(0,fileName.length()-3);
@@ -142,34 +87,29 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 	  /*
 	   * read first line and tokenize it to store the value of read_page
 	   */
-	  getline (mdFile, line);
-	  pch = strtok (&line[0], " ");
-	  pch = strtok (NULL, " ");
-	  readPage = atoi (pch);	//convert char* to int
-	  /*
-	   * read first line and tokenize it to store the value of read_record
-	   */
-	  getline (mdFile, line);
-	  pch = strtok (&line[0], " ");
-	  pch = strtok (NULL, " ");
-	  readRecord = atoi (pch);	//convert char* to int
-	  /*
-	   * read first line and tokenize it to store the value of write_page
-	   */
-	  getline (mdFile, line);
-	  pch = strtok (&line[0], " ");
-	  pch = strtok (NULL, " ");
-	  writePage = atoi (pch);	//convert char* to int
 
-//cout<<"writePage "<<writePage<<endl;
-
-	  mdFile.close ();
-	 
+      getline(mdFile,line);
+      if(line=="heap")
+    	  genericFile=new Heap();
+      else if(line=="sorted")
+      {
+    	  //instantiate generic file to sorted file
+      }
+      	  mdFile.close ();
+	 return genericFile->Open(f_path);
 	}
- return 1;
+      else
+      {
+    	  cout<<"something wrong in mdfile"<<endl;
+    	  return 0;
+      }
+
     }
   else
+  {
+	  cout<<"check file path"<<endl;
     return 0;
+  }
 }
 
 
@@ -178,127 +118,38 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 */
 void
 DBFile::MoveFirst ()
-{
-  readPage = 1;
-  readRecord = 0;
+{genericFile->MoveFirst();
 }
 
 int
 DBFile::Close ()
 {
 
-
-  //Appending the write buffer to end of file to add remaining elements in the buffer
-  if (flag == 1)
-    {
-      dbFile.AddPage (rwBuffer, writePage);
-    }
-
-  dbFile.Close ();
-  ofstream mdFile;
-//cout<<"in close function"<<endl;
-//cout<<metaDataFileName<<endl;
-  mdFile.open (metaDataFileName);
-  //cout<<"readPage: "<<readPage<<endl;
-  mdFile << "readPage " << readPage << endl;
-  //cout<<"readRecord: "<<readRecord<<endl;
-  mdFile << "readRecord " << readRecord << endl;
-  //cout<<"writePage: "<<writePage<<endl;
-  mdFile << "writePage " << writePage << endl;
-  mdFile.close ();
-  return 1;
+return genericFile->Close();
 }
 
 void
 DBFile::Add (Record & rec)
 {
-  //cout<<"in 1"<<endl;
-  //rwBuffer->EmptyItOut();
-  if (flag == 0 || (flag == -1 && dbFile.GetLength () > 2))
-    {
-      dbFile.GetPage (rwBuffer, writePage);
-      flag = 1;
-
-    }
-  else
-    flag = 1;
-  if (!rwBuffer->Append (&rec))
-    {
-      dbFile.AddPage (rwBuffer, writePage);
-      writePage++;
-      rwBuffer->EmptyItOut ();
-      rwBuffer->Append (&rec);
-
-    }
-
+genericFile->Add(rec);
 }
 
 int
 DBFile::GetNext (Record & fetchme)
 {
-
-  if (flag == -1 && dbFile.GetLength () == 0)
-    return 0;
-
-  if (flag != 0)
-    {
-      if (flag == 1)
-	{
-	  dbFile.AddPage (rwBuffer, writePage);
-	  rwBuffer->EmptyItOut ();
-	}
-      dbFile.GetPage (rwBuffer, readPage);
-      flag = 0;
-      for (int i = 0; i < readRecord; i++)
-	{
-	  Record temp;
-	  rwBuffer->GetFirst (&temp);
-	}
-
-    }
-
-  if (!rwBuffer->GetFirst (&fetchme))
-    {
-
-      int noOfPages = dbFile.GetLength () - 1;
-      if (readPage + 1 < noOfPages)
-	{
-		readRecord = 0;
-	  readPage = readPage + 1;
-	  dbFile.GetPage (rwBuffer, readPage);
-	  rwBuffer->GetFirst (&fetchme);
-
-	}
-      else
-	return 0;
-    }
-  readRecord++;
-//cout<<readRecord<<endl;
-  return 1;
+return genericFile->GetNext(fetchme);
 }
 
 
 int
 DBFile::GetNext (Record & fetchme, CNF & cnf, Record & literal)
 {
-  int cnt = 0;
-  Schema x ("catalog", "nation");
-  ComparisonEngine compEngine;
-  while (GetNext (fetchme))
-    {
-      //fetchme.Print(&x);
-      if (compEngine.Compare (&fetchme, &literal, &cnf))
-	{
-	  return 1;
-	}
-    }
-
-  return 0;
+return genericFile->GetNext(fetchme,cnf,literal);
 }
 
 
 DBFile::~DBFile ()
 {
-  delete rwBuffer;
+  delete genericFile;
 }
 

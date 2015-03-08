@@ -35,7 +35,6 @@ private:
 
 public:
 	Record ();
-	//Record(const Record& b1);
 	~Record();
 
 	// suck the contents of the record fromMe into this; note that after
