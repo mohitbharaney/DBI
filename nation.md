@@ -1,3 +1,4 @@
+heap
 readPage 1
-readRecord 0
+readRecord 25
 writePage 1

@@ -50,6 +50,7 @@ extract file name and convert it to fileName.md for the metaData file
 
 	 ofstream mdFile;
   mdFile.open (metaDataFileName);
+  mdFile << "heap"<<endl;
   mdFile << "readPage " << 1 << endl;
   mdFile << "readRecord " << 0 << endl;
   mdFile << "writePage " << 1 << endl;
@@ -146,6 +147,7 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 	  /*
 	   * read first line and tokenize it to store the value of read_page
 	   */
+      getline (mdFile,line);
 	  getline (mdFile, line);
 	  pch = strtok (&line[0], " ");
 	  pch = strtok (NULL, " ");
@@ -204,6 +206,7 @@ Heap::Close ()
 //cout<<metaDataFileName<<endl;
   mdFile.open (metaDataFileName);
   //cout<<"readPage: "<<readPage<<endl;
+  mdFile << "heap" <<endl;
   mdFile << "readPage " << readPage << endl;
   //cout<<"readRecord: "<<readRecord<<endl;
   mdFile << "readRecord " << readRecord << endl;

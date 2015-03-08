@@ -100,7 +100,7 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 	}
       else
       {
-    	  cout<<"something wrong in mdfile"<<endl;
+    	  cout<<"check if file exists else u are screwed"<<endl;
     	  return 0;
       }
 
@@ -118,7 +118,8 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 */
 void
 DBFile::MoveFirst ()
-{genericFile->MoveFirst();
+{
+	genericFile->MoveFirst();
 }
 
 int
