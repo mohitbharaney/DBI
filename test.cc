@@ -6,19 +6,27 @@ void test2 ();
 void test3 ();
 
 int add_data (FILE *src, int numrecs, int &res) {
+
+
 	DBFile dbfile;
 	dbfile.Open (rel->path ());
 	Record temp;
-
+	cout<<"check point"<<endl;
 	int proc = 0;
 	int xx = 20000;
-	while ((res = temp.SuckNextRecord (rel->schema (), src)) && ++proc < numrecs) {
-		dbfile.Add (temp);
-		if (proc == xx) cerr << "\t ";
-		if (proc % xx == 0) cerr << ".";
-	}
+	cout<<"check point"<<endl;
+	if(src==NULL)
+		cout<<"error caught"<<endl;
+	while (proc < numrecs && (res = temp.SuckNextRecord (rel->schema (), src))) {
+	    dbfile.Add (temp);
+	    proc++;
+	    if (proc == xx) cerr << "\t ";
+	    if (proc % xx == 0) cerr << ".";
+	 }
 
 	dbfile.Close ();
+
+	cout<<"returning"<<endl;
 	return proc;
 }
 
@@ -41,6 +49,7 @@ void test1 () {
 	cout << "\n output to dbfile : " << rel->path () << endl;
 	dbfile.Create (rel->path(), sorted, &startup);
 	dbfile.Close ();
+
 
 	char tbl_path[100];
 	sprintf (tbl_path, "%s%s.tbl", tpch_dir, rel->name()); 
@@ -101,6 +110,9 @@ void test3 () {
 	CNF cnf; 
 	Record literal;
 	rel->get_cnf (cnf, literal);
+	//cout<<"printing literal"<<endl;
+	//literal.Print(rel->schema());
+
 
 	DBFile dbfile;
 	dbfile.Open (rel->path());

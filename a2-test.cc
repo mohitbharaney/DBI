@@ -111,6 +111,7 @@ void test1 (int option, int runlen) {
 
 	BigQ bq (input, output, sortorder, runlen);
 
+	cout<<"test------------------------------------------------------------------"<<endl;
 	pthread_join (thread1, NULL);
 	pthread_join (thread2, NULL);
 }

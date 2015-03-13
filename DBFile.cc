@@ -12,6 +12,8 @@
 #include <fstream>
 #include "Heap.h"
 #include "GenericDB.h"
+#include "Sorted.h"
+
 // stub file .. replace it with your own DBFile.cc
 
 GenericDB *genericFile;
@@ -32,6 +34,10 @@ DBFile::Create (char *f_path, fType f_type, void *startup)
 		{
 			genericFile=new Heap();
 
+		}
+		else if(f_type==sorted)
+		{
+			genericFile=new Sorted();
 		}
 
 		if(genericFile!=NULL)
@@ -93,7 +99,7 @@ strcpy(&metaDataFileName[0],&fileName[0]);
     	  genericFile=new Heap();
       else if(line=="sorted")
       {
-    	  //instantiate generic file to sorted file
+    	  genericFile=new Sorted();
       }
       	  mdFile.close ();
 	 return genericFile->Open(f_path);

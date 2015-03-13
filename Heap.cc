@@ -126,6 +126,7 @@ Heap::Load (Schema & f_schema, char *loadpath)
 int
 Heap::Open (char *f_path)
 {
+	//cout<<"in open heap"<<endl;
 
   if (f_path != NULL)
     {
@@ -169,6 +170,7 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 
 //cout<<"writePage "<<writePage<<endl;
 
+	 // cout<<"exiting open"<<endl;
 	  mdFile.close ();
 	 
 	}
@@ -187,6 +189,7 @@ Heap::MoveFirst ()
 {
   readPage = 1;
   readRecord = 0;
+ // cout<<"exiting move first"<<endl;
 }
 
 int
@@ -244,6 +247,7 @@ int
 Heap::GetNext (Record & fetchme)
 {
 
+//	cout<<"new point check"<<endl;
   if (flag == -1 && dbFile.GetLength () == 0)
     return 0;
 

@@ -6,6 +6,8 @@
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
+#include <string.h>
+#include <string>
 
 
 // This stores an individual comparison that is part of a CNF
@@ -60,6 +62,10 @@ public:
 
 	// print to the screen
 	void Print ();
+
+	char* toString();
+	void setAtrr(int numAtts,int whichAtts[MAX_ANDS],int whichTypes[MAX_ANDS]);
+
 };
 
 class Record;
@@ -84,7 +90,8 @@ public:
 	// only if it is impossible to determine an acceptable ordering
 	// for the given comparison
 	int GetSortOrders (OrderMaker &left, OrderMaker &right);
-
+	int GetSortOrders (OrderMaker &left);
+	int createQuery(OrderMaker& sortOrder, OrderMaker& output);
 	// print the comparison structure to the screen
 	void Print ();
 

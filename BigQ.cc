@@ -41,6 +41,7 @@ struct args {
  * work function for the worker thread
  */
 void* work(void* arguments) {
+	//cout<<"helloooooo-------------------------------------------"<<endl;
 	struct args* para;					//args struc to receive arguments
 	para = (struct args*) arguments;
 
@@ -61,8 +62,10 @@ void* work(void* arguments) {
 	phase1.AddPage(input, 0);
 	int noOfRuns = 0;
 //	bool flag;
+
 	while (in->Remove(temp)) {//Retrieve the record in temp from the input pipe
 
+//		cout<<"in while"<<endl;
 		if (!input->Append(temp)) {	//add to input buffer, if fails go into if
 			count++;								//increases the pageCount
 			Record* t1 = new Record();
@@ -216,6 +219,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 	//cout << "total run" << totalrun << endl;
 	int fileLegth = tempFile.GetLength() - 1;
 //	cout << "file length" << fileLegth << endl;
+	//Schema s("catalog","nation");
 
 	if (totalrun == 1) {
 
@@ -228,6 +232,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 			Record *tempRecord = new Record();
 
 			while (page->GetFirst(tempRecord)) {
+	//			tempRecord->Print(&s);
 				outPipe->Insert(tempRecord);
 			}
 			delete tempRecord;
@@ -292,6 +297,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 					recordVector[minIndex]=NULL;
 					nullCounter++;
 				}
+
 
 			} else {
 				copyRecord->Copy(tmpRecord);

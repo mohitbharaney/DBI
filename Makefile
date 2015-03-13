@@ -13,8 +13,8 @@ test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o GenericDB.o S
 a2test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o Sorted.o GenericDB.o Heap.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o
 	$(CC) -o a2test.out Record.o Comparison.o ComparisonEngine.o Schema.o Sorted.o File.o BigQ.o GenericDB.o Heap.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o -lfl -lpthread
 	
-a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o GenericDB.o Heap.o DBFile.o Pipe.o y.tab.o lex.yy.o a1-test.o
-	$(CC) -o a1test.out Record.o Comparison.o GenericDB.o Heap.o ComparisonEngine.o Schema.o File.o  DBFile.o Pipe.o y.tab.o lex.yy.o a1-test.o -lfl
+a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o GenericDB.o Heap.o Sorted.o DBFile.o BigQ.o Pipe.o y.tab.o lex.yy.o a1-test.o
+	$(CC) -o a1test.out Record.o Comparison.o GenericDB.o Heap.o ComparisonEngine.o Schema.o File.o Sorted.o  DBFile.o BigQ.o Pipe.o y.tab.o lex.yy.o a1-test.o -lfl -lpthread
 	
 test.o: test.cc
 	$(CC) -g -c test.cc

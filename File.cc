@@ -247,6 +247,7 @@ void File :: Open (int fileLen, char *fName) {
 
 	// see if there was an error
 	if (myFilDes < 0) {
+		cout<<fName<<endl;
 		cerr << "BAD!  Open did not work for " << fName << "\n";
 		exit (1);
 	}
