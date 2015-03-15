@@ -1,6 +1,6 @@
 sorted
-readPage 1
-readRecord 0
+readPage 2
+readRecord 25
 writePage 1
 1
 1 

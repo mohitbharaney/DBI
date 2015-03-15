@@ -30,6 +30,7 @@ char fname[400];
 char metaDataFileName[400];
 ComparisonEngine cmp;
 OrderMaker query;
+pthread_t work;
 Sorted::Sorted() {
 
 	//metaDataFileName = "metaData.txt";
@@ -230,7 +231,10 @@ void Sorted::MoveFirst() {
 int Sorted::Close() {
 
 	if (mode == WRITE)
+	{
+		//pthread_join(work,NULL);
 		merge();
+	}
 
 	ofstream mdFile;
 	mdFile.open(metaDataFileName);
@@ -249,6 +253,8 @@ int Sorted::Close() {
 
 void* work1(void* t) {
 	BigQ bq(*input, *output, *sortorder, runLen);
+	cout<<"exited big q sucessfully"<<endl;
+
 }
 
 void Sorted::Add(Record & rec) {
@@ -259,8 +265,8 @@ void Sorted::Add(Record & rec) {
 		output = new Pipe(buffsz);
 		input->Insert(&rec);
 		//cout << "before bigq initilization" << endl;
-		pthread_t worker;
-		pthread_create(&worker, NULL, work1, NULL);
+
+		pthread_create(&work, NULL, work1, NULL);
 
 		//BigQ bq(*input, *output, *sortorder, runLen);
 		//cout << "after bigq initilization" << endl;
@@ -392,6 +398,7 @@ int Sorted::GetNext(Record & fetchme, CNF & cnf, Record  &literal) {
 }
 
 void Sorted::merge() {
+
 	mode = START;
 	input->ShutDown();
 	int count = 0;
@@ -418,7 +425,7 @@ void Sorted::merge() {
 
 		output->ShutDown();
 
-		//cout << "records inserted are " << count << endl;
+		cout << "records inserted are---------------------------------------------- " << count << endl;
 
 	} else {
 
@@ -573,5 +580,5 @@ int Sorted::binarySearch(int low, int high, Record literal, OrderMaker& query) {
 }
 
 Sorted::~Sorted() {
-//	delete rwBuffer;
+	delete rwBuffer;
 }

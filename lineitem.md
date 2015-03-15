@@ -1,7 +1,7 @@
 sorted
-readPage 1
-readRecord 0
-writePage 1
+readPage 100
+readRecord 437
+writePage 99
 1
 0 
 0 

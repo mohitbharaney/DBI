@@ -163,7 +163,7 @@ BigQ::~BigQ() {
 
 void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		File &phase1,int& offset) {
-	Schema mySchema("catalog", "nation");
+	Schema mySchema("catalog", "region");
 	//cout<<"in write to file"<<endl;
 
 //	data[0]->Print(&mySchema);
@@ -219,7 +219,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 	//cout << "total run" << totalrun << endl;
 	int fileLegth = tempFile.GetLength() - 1;
 //	cout << "file length" << fileLegth << endl;
-	//Schema s("catalog","nation");
+	Schema s("catalog","region");
 
 	if (totalrun == 1) {
 
@@ -232,7 +232,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 			Record *tempRecord = new Record();
 
 			while (page->GetFirst(tempRecord)) {
-	//			tempRecord->Print(&s);
+				//tempRecord->Print(&s);
 				outPipe->Insert(tempRecord);
 			}
 			delete tempRecord;

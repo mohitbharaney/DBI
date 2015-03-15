@@ -157,6 +157,6 @@ return genericFile->GetNext(fetchme,cnf,literal);
 
 DBFile::~DBFile ()
 {
-  delete genericFile;
+
 }
 
