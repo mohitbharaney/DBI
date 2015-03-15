@@ -364,7 +364,7 @@ int Sorted::GetNext(Record & fetchme, CNF & cnf, Record  &literal) {
 
 	Record test;
 	test.Copy(&literal);
-	//cout<<"in get next"<<endl;
+	cout<<"in get next"<<endl;
 	if (mode != READ) {
 		if (mode == WRITE)
 			merge();
@@ -380,17 +380,21 @@ int Sorted::GetNext(Record & fetchme, CNF & cnf, Record  &literal) {
 	}
 
 	//Record temp;
-	Schema s("catalog","lineitem");
+	Schema s("catalog","customer");
 	if(readPage==-1)
 		return 0;
 	while (GetNext(fetchme)) {
-		//cout<<"in while"<<endl;
-//fetchme.Print(&s);
-		Record temp;
-		temp.Copy(&literal);
+
+		//fetchme.Print(&s);
 		if (cmp1.Compare(&fetchme, &literal	, &cnf)) {
 		cout<<"after comapre"<<endl;
 			return 1;
+		}
+
+		if(cmp1.Compare(&fetchme,&literal,sortorder)>0)
+		{
+			cout<<"test here"<<endl;
+			break;
 		}
 
 	}
@@ -542,6 +546,7 @@ int Sorted::binarySearch(int low, int high, Record literal, OrderMaker& query) {
 		if (val == 0)
 			return mid;
 		else if (val < 0) {
+			cout<<"here1"<<endl;
 			if (mid + 1 <= high) {
 				dbFile.GetPage(rwBuffer, mid + 1);
 				Record t2;
@@ -554,7 +559,10 @@ int Sorted::binarySearch(int low, int high, Record literal, OrderMaker& query) {
 			}
 			low = mid + 1;
 		} else {
-			if (mid - 1 <= low) {
+			cout<<"here2"<<endl;
+			if (mid - 1 >=low) {
+				cout<<mid-1<<endl;
+				cout<<"low "<<low<<endl;
 				dbFile.GetPage(rwBuffer, mid - 1);
 				Record t2;
 				rwBuffer->GetFirst(&t2);
@@ -562,7 +570,7 @@ int Sorted::binarySearch(int low, int high, Record literal, OrderMaker& query) {
 				if (val == 0)
 					return mid - 1;
 				if (val < 0)
-					return mid;
+					return mid-1;
 			}
 			high = mid - 1;
 
