@@ -19,7 +19,7 @@ class Heap : public  GenericDB{
 	int flag;
 	Page *rwBuffer;
 	File dbFile;
-	char metaDataFileName[40];
+//	char metaDataFileName[40];
 
 public:
 	Heap ();

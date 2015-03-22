@@ -218,7 +218,7 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 	vector<Record *> recordVector; // it will store the 1st record of 1st page
 	//cout << "total run" << totalrun << endl;
 	int fileLegth = tempFile.GetLength() - 1;
-//	cout << "file length" << fileLegth << endl;
+	cout << "file length" << fileLegth << endl;
 	Schema s("catalog","region");
 
 	if (totalrun == 1) {

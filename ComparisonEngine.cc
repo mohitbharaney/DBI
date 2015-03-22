@@ -146,17 +146,13 @@ int ComparisonEngine :: Compare (Record *left, OrderMaker *order_left, Record *r
 // dpending upon wheter or not the CNF expression accepts the record
 int ComparisonEngine :: Compare (Record *left, Record *literal, CNF *myComparison) {
 
-//	cout<<"start compare      "<<myComparison->numAnds<<endl;
 	for (int i = 0; i < myComparison->numAnds; i++) {
-
 
 		for (int j = 0; j < myComparison->orLens[i]; j++) {
 
-
 			// this returns a 0 if the comparison did not eval to true
-			//cout<<"after run"<<endl;
 			int result = Run(left, literal, &myComparison->orList[i][j]);
-			//cout<<"after run"<<endl;
+			
 			if (result != 0) {
 				break;	
 			}
@@ -170,7 +166,7 @@ int ComparisonEngine :: Compare (Record *left, Record *literal, CNF *myCompariso
 		// this ends the for-loop for the OR-list... if we made it this far, then we'll go on to the
 		// next disjunction in the overall CNF expression
 	}
-	//cout<<"start 2 compare"<<endl;
+
 	// this ends the for-loop for the AND-list... if we made it this far, then we know that we
 	// have satisfied the overall CNF expression
 	return 1;	
@@ -215,7 +211,6 @@ int ComparisonEngine :: Run (Record *left, Record *literal, Comparison *c) {
 	char *lit_bits = literal->GetBits();
 
 	// first get a pointer to the first value to compare
-
 	if (c->operand1 == Left) {
 		val1 = left_bits + ((int *) left_bits)[c->whichAtt1 + 1];
 	} else {
@@ -302,7 +297,7 @@ int ComparisonEngine :: Run (Record *left, Record *literal, Comparison *c) {
 		}	
 		break;
 	}
-	//cout<<"cp----------------------------------------------"<<endl;
+
 }
 
 // This is an internal function used by the comparison engine

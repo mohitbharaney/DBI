@@ -21,13 +21,13 @@
 #include "Heap.h"
 #include "GenericDB.h"
 
-int buffsz = 100; // pipe cache size
+int sortedBuffSZ = 100; // pipe cache size
 Pipe *input; //(buffsz);
 Pipe *output; //(buffsz);
 int runLen;
 OrderMaker *sortorder = new OrderMaker();
 char fname[400];
-char metaDataFileName[400];
+//char metaDataFileName[400];
 ComparisonEngine cmp;
 OrderMaker query;
 pthread_t work;
@@ -77,7 +77,7 @@ int Sorted::Create(char *f_path, fType f_type, void *startup) {
 		mdFile << "readPage " << 1 << endl;
 		mdFile << "readRecord " << 0 << endl;
 		mdFile << "writePage " << 1 << endl;
-		mdFile << sortorder->toString() << endl;
+
 
 		mdFile.close();
 
@@ -261,8 +261,8 @@ void Sorted::Add(Record & rec) {
 
 	switch (mode) {
 	case START: {
-		input = new Pipe(buffsz);
-		output = new Pipe(buffsz);
+		input = new Pipe(sortedBuffSZ);
+		output = new Pipe(sortedBuffSZ);
 		input->Insert(&rec);
 		//cout << "before bigq initilization" << endl;
 
@@ -275,8 +275,8 @@ void Sorted::Add(Record & rec) {
 	}
 		break;
 	case READ: {
-		input = new Pipe(buffsz);
-		output = new Pipe(buffsz);
+		input = new Pipe(sortedBuffSZ);
+		output = new Pipe(sortedBuffSZ);
 		input->Insert(&rec);
 
 		pthread_t worker;
