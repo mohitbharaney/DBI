@@ -18,6 +18,8 @@ int totalselected=0;
 ComparisonEngine cmp;
 Record *tempRecord = new Record();
 SelectPipe *selectPipeObj = (SelectPipe *)arg;
+
+
 	while((selectPipeObj->inputPipe)->Remove(tempRecord))
 	{
 		totalcount++;
@@ -62,6 +64,8 @@ int totalselected=0;
 ComparisonEngine cmp; 
 SelectFile *selectFileObj = (SelectFile *)arg;
 Record *tempRecord = new Record();
+
+(selectFileObj->dbInFile)->MoveFirst();
 
 while((selectFileObj->dbInFile)->GetNext(*tempRecord))
 {   totalcount++;
@@ -151,6 +155,8 @@ while((writeObj->inputPipe)->Remove(tempRecord))
 		tempRecord->WriteToFile(writeObj->outFileWriteOut,writeObj->schemaWriteOut);
 
 		}
+		
+cout<<"write to file is done"<<endl;
 }
 void WriteOut::WaitUntilDone () {
 	  pthread_join (writeOutThread, NULL);
@@ -227,7 +233,90 @@ void Sum::WaitUntilDone () {
 	  pthread_join (sumThread, NULL);
 }
 	
+void DuplicateRemoval:: Run (Pipe &inPipe, Pipe &outPipe, Schema &mySchema)
+{
+	inputPipeDupliRemoval=&inPipe;
+	outPipeDupliRemoval=&outPipe;
+	schemaDupliRemoval=&mySchema;
+	pthread_create(&duplicateRemovalThread, NULL, duplicateRemovalMethod,(void*) this);
+	pthread_create(&bigQThread,NULL, createSortedDataBigQ,(void*) this);
 	
+}
+void *duplicateRemovalMethod(void *args)
+{
+	
+	
+	DuplicateRemoval *dupliObj=(DuplicateRemoval *)args;
+	OrderMaker sortedOrder=OrderMaker(dupliObj->schemaDupliRemoval);
+	
+	//BigQ *bigQ_obj;
+	//Pipe temp(100); // created this pipe for storing the sorted output of bigQ
+		
+	//bigQ_obj=new BigQ(*(dupliObj->inputPipeDupliRemoval), temp,sortedOrder,dupliObj->dupliRunLength);
+	
+	// temp pipe contains the sorted data. we will compare its one record with next record
+	
+	Record *nextRecord=new Record();
+	Record *currentRecord=new Record();
+	ComparisonEngine cmpe;
+	
+	int recordDropped=0;
+	int recordtaken=0;
+	
+	// inserting the first record in the outputpipe
+	if((dupliObj->tempBigQ).Remove(nextRecord))
+	{
+		currentRecord->Copy(nextRecord);
+		(dupliObj->outPipeDupliRemoval)->Insert(nextRecord);
+		recordtaken++;
+		
+	}	
+	//nextRecord will contain next record and currentRecord will contain record just one previous to nextRecord. Everytime we will copy the record
+	while((dupliObj->tempBigQ).Remove(nextRecord))
+	{
+		if(cmpe.Compare(currentRecord,nextRecord,&sortedOrder)!=0) // two consequtive records are different
+		{
+		 currentRecord->Copy(nextRecord);  // copying as it will be used in next iteration
+		(dupliObj->outPipeDupliRemoval)->Insert(nextRecord);
+		recordtaken++;
+		}
+		else
+			recordDropped++;
+	 
+	}
+	
+	cout<<"Duplic Removal class::record taken"<<recordtaken<<endl;
+	cout<<"Dupli removal class::record dropped"<<recordDropped<<endl;
+	
+	(dupliObj->tempBigQ).ShutDown();
+	(dupliObj->outPipeDupliRemoval)->ShutDown();
+	
+	
+}	
+	
+ 
+void *createSortedDataBigQ(void *args)
+{
+		DuplicateRemoval *dupliObj=(DuplicateRemoval *)args;
+		OrderMaker sortedOrder=OrderMaker(dupliObj->schemaDupliRemoval);
+		dupliObj->bigQ_obj=new BigQ(*(dupliObj->inputPipeDupliRemoval), dupliObj->tempBigQ,sortedOrder,dupliObj->dupliRunLength);
+		
+}
+	
+		
+void DuplicateRemoval::WaitUntilDone () {
+	  pthread_join (duplicateRemovalThread, NULL);
+	  pthread_join (bigQThread, NULL);
+}
+	
+	
+		
+void DuplicateRemoval::Use_n_Pages (int n) {
+   
+   dupliRunLength=n;
+   }
+	
+		
 	
 	
 	

@@ -22,6 +22,7 @@ static void *joinMethod(void *);
 static void *sumMethod(void *);
 static void *groupByMethod(void *);
 static void *duplicateRemovalMethod(void *);
+static void *createSortedDataBigQ(void *);
 
 class RelationalOp {
 	public:
@@ -96,15 +97,25 @@ class DuplicateRemoval : public RelationalOp {
 	
 	private:
 	pthread_t duplicateRemovalThread;
+	pthread_t bigQThread;
 	
 	public:
+	
+	
 	Pipe *inputPipeDupliRemoval;
 	Pipe *outPipeDupliRemoval;
 	Schema *schemaDupliRemoval;
 	
-	void Run (Pipe &inPipe, Pipe &outPipe, Schema &mySchema) { }
-	void WaitUntilDone () { }
-	void Use_n_Pages (int n) { }
+	int dupliRunLength;
+	
+	BigQ *bigQ_obj;
+	Pipe tempBigQ;
+	DuplicateRemoval():tempBigQ(100);
+	 
+	void Run (Pipe &inPipe, Pipe &outPipe, Schema &mySchema);
+	void WaitUntilDone ();
+	void Use_n_Pages (int n);
+	//~DuplicateRemoval() {}
 };
 class Sum : public RelationalOp {
 	private:

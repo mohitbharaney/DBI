@@ -12,10 +12,10 @@ int clear_pipe (Pipe &in_pipe, Schema *schema, bool print) {
 	int cnt = 0;
 	cout<<"in clear pipe"<<endl;
 	while (in_pipe.Remove (&rec)) {
-		cout<<"in while loop clear_pipe"<<endl;
+		//cout<<"in while loop clear_pipe"<<endl;
 		if (print) {
 			rec.Print (schema);
-			cout<<"in if"<<endl;
+			//cout<<"in if"<<endl;
 		}
 		cnt++;
 	}

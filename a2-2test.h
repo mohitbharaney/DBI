@@ -13,8 +13,8 @@ using namespace std;
 // make sure that the information below is correct
 
 char *catalog_path = "catalog"; 
-char *dbfile_dir = "/home/mugdha/Documents/DBIProject/downlded/Assignment3/";
-char *tpch_dir="/home/mugdha/Documents/DBIProject/10M/";
+char *dbfile_dir = "/home/mugdha/Documents/gitProj/DBI/";
+char *tpch_dir="/home/mugdha/Documents/gitProj/DBI/10M/";
 
 
 extern "C" {
