@@ -2,55 +2,60 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include <algorithm>
-ComparisonEngine compEngine;
-OrderMaker globalSortOrder;
+#include "DBFile.h"
+#include <time.h>
+#include<sstream>
+//ComparisonEngine compEngine;
+//OrderMaker globalSortOrder;
 
-void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
-		File &phase1,int& offset);
-void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe);
+//void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
+//		File &phase1,int& offset);
+//void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe);
 
-
-bool sortFunc(Record* left, Record* right) {
-	//cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
-	if (left == NULL && right == NULL)
-		return true;
-	if (left == NULL)
-		return false;
-	if (right == NULL)
-		return true;
-
-	if (compEngine.Compare(left, right, &globalSortOrder) < 0)
-		return true;
-
-	if (compEngine.Compare(left, right, &globalSortOrder) >= 0)
-		return false;
-
-	return true;
-}
+//bool BigQ::sortFunc(Record* left, Record* right) {
+//	//cout<<"comparison value is "<<compEngine.Compare(left, right, &globalSortOrder)<<endl;
+//	if (left == NULL && right == NULL)
+//		return true;
+//	if (left == NULL)
+//		return false;
+//	if (right == NULL)
+//		return true;
+//
+//	if (cmpEngine.Compare(left, right, classSortOrder) < 0)
+//		return true;
+//
+//	if (cmpEngine.Compare(left, right, classSortOrder) >= 0)
+//		return false;
+//
+//	return true;
+//}
 
 /*
  * args strucutre to pass parameters to the thread;
  */
-struct args {
-	Pipe *in;
-	Pipe *out;
-	OrderMaker *sortorder;
-	int runlen;
-};
+
 /*
  * work function for the worker thread
  */
-void* work(void* arguments) {
-	//cout<<"helloooooo-------------------------------------------"<<endl;
-	struct args* para;					//args struc to receive arguments
-	para = (struct args*) arguments;
 
+void* workerThread(void* arguments)
+{
+	BigQ* data=(BigQ*)arguments;
+	data->work(arguments);
 
-	Pipe* in = para->in;	//pointer to the parameters , needed for tpmms algo
-	Pipe* out = para->out;	//pointer to the parameters , needed for tpmms algo
-	OrderMaker* sortorder = para->sortorder;//pointer to the parameters , needed for tpmms algo
-	int runlen = para->runlen;//pointer to the parameters , needed for tpmms algo
-	int offset=1;
+}
+
+void* BigQ::work(void* arguments) {
+
+	//cout<<"in work"<<endl;
+	//struct args* para;					//args struc to receive arguments
+	BigQ* para = (BigQ*) arguments;
+
+	Pipe* in = para->input;	//pointer to the parameters , needed for tpmms algo
+	Pipe* out = para->output;	//pointer to the parameters , needed for tpmms algo
+	OrderMaker* sortorder = para->classSortOrder;//pointer to the parameters , needed for tpmms algo
+	int runlen = para->runlength;//pointer to the parameters , needed for tpmms algo
+
 	int count = 0;
 	Record* temp = new Record();
 	Record* copyRec;
@@ -58,14 +63,21 @@ void* work(void* arguments) {
 	Page* output = new Page();
 	vector<Record*> toSort;
 	File phase1;
-	phase1.Open(0, "phase1.bin");
+
+//long double sysTime=time(0);
+
+	stringstream ss;
+	ss<<"phase"<<para->id<<".bin";
+	string runFile=ss.str();
+	//cout<<endl<<runFile<<endl;
+	phase1.Open(0, (char*)runFile.c_str());
 	phase1.AddPage(input, 0);
 	int noOfRuns = 0;
+	int recs=0;
+	int offset=1;
 //	bool flag;
-
 	while (in->Remove(temp)) {//Retrieve the record in temp from the input pipe
 
-//		cout<<"in while"<<endl;
 		if (!input->Append(temp)) {	//add to input buffer, if fails go into if
 			count++;								//increases the pageCount
 			Record* t1 = new Record();
@@ -74,6 +86,7 @@ void* work(void* arguments) {
 				copyRec = new Record();
 				copyRec->Copy(t1);
 				toSort.push_back(copyRec);
+				recs++;
 			}
 
 			if (count == runlen) {
@@ -94,7 +107,7 @@ void* work(void* arguments) {
 		t2->Copy(t1);
 		//t1->Print(&mySchema);
 		toSort.push_back(t2);
-
+		recs++;
 	}
 
 	if (!toSort.empty()) {
@@ -104,9 +117,9 @@ void* work(void* arguments) {
 		noOfRuns++;
 	}
 
-	//cout << "total no of runs are " << noOfRuns << endl;
+		//cout << "total no of records are " << recs << endl<<endl;
 	phase1.Close();
-	mergeRuns(runlen, noOfRuns, "phase1.bin", out);
+	mergeRuns(runlen, noOfRuns, (char*)runFile.c_str(), out);
 
 ///*
 // *
@@ -136,13 +149,20 @@ BigQ::BigQ(Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 
 	pthread_t worker;
 	int check;
-	struct args arguments;
-	arguments.in = &in;
-	arguments.out = &out;
-	arguments.sortorder = &sortorder;
-	arguments.runlen = runlen;
-	globalSortOrder = sortorder;
-	check = pthread_create(&worker, NULL, work, (void*) &arguments);
+	input=&in;
+	output=&out;
+	classSortOrder=&sortorder;
+	runlength=runlen;
+//	struct args arguments;
+//	arguments.in = &in;
+//	arguments.out = &out;
+//	arguments.sortorder = &sortorder;
+//	arguments.runlen = runlen;
+	static int globalCount=0;
+	id=globalCount++;
+	classSortOrder= &sortorder;
+	myObject.test=&sortorder;
+	check = pthread_create(&worker, NULL, workerThread, (void*) this);
 	if (check != 0) {
 		cout << "error in thread creatig";
 		//exit(1);
@@ -154,27 +174,19 @@ BigQ::BigQ(Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 
 	// finally shut down the out pipe
 	pthread_join(worker, NULL);
-	//out.ShutDown();
+//	out.ShutDown();
 }
 
 BigQ::~BigQ() {
 
 }
 
-void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
+void BigQ::writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 		File &phase1,int& offset) {
-	Schema mySchema("catalog", "region");
-	//cout<<"in write to file"<<endl;
+//	Schema mySchema("catalog", "nation");
 
-//	data[0]->Print(&mySchema);
-//	cout<<endl;
-//	data[1]->Print(&mySchema);
-//	cout<<endl;
-//	data[24]->Print(&mySchema);
-//	cout<<endl;
-
-	sort(data.begin(), data.begin() + data.size(), sortFunc);//sort the vector based on the custom function
-
+	//sort(data.begin(), data.begin() + data.size(),sortFunc);//sort the vector based on the custom function
+sort(data.begin(),data.begin()+data.size(),myObject);
 	Record *temp = new Record();									//temp rec
 	Page* output = new Page();									//output buffer
 	bool flag;//flag to check after the while loop,if the entire vecotrs written to the temp file
@@ -183,24 +195,28 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 	while (count < data.size()) {//run the loop till the entire vectors been traversed
 		flag = true;							//set the flag true in the loop
 		temp->Copy(data[count]);		//retrive the record in temp
-		//temp->Print(&mySchema);
-		//cout<<endl;
 		if (!output->Append(temp)) {			//if the output buffer is full
-			//int offset = noOfRun * runLength + outCount;//calculate the offset at which the record is to be put
+	//		int offset = noOfRun * runLength + outCount;//calculate the offset at which the record is to be put
+//			offset++;
+			//cout<<"offset="<<offset<<endl;
 			phase1.AddPage(output, offset);				//add page to the file
+			 offset++;
 			output->EmptyItOut();							//empty the buffer
 			output->Append(temp);//add the last record that triggered the if condition to the output buffer
-			offset++;
-
+			//outCount++;							//ouput page count goes up by 1
+			
 			flag = true;	//set flag to false as the entire pages is written
 		}
 		count++;					//increment the count in vector traversal
 	}
 	if (flag) {	//if the while loop exits with flag=true it implies that the vector was not of exact page size, henc the last page still needs to be written to the file
 
+	//	int offset = noOfRun * runLength + outCount;//following code is to handle the above case
+	//	offset++;
+		//cout<<"in if offset="<<offset<<endl;
 		phase1.AddPage(output, offset);
-		offset++;
 		output->EmptyItOut();
+ offset++;
 	}
 	for(int i=0;i<data.size();i++)
 		delete data[i];
@@ -210,7 +226,7 @@ void writeToFile(vector<Record*> &data, int noOfRun, int runLength,
 	//delete temp;
 }
 
-void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
+void BigQ::mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 
 	File tempFile;
 	tempFile.Open(1, f_path);
@@ -218,8 +234,35 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 	vector<Record *> recordVector; // it will store the 1st record of 1st page
 	//cout << "total run" << totalrun << endl;
 	int fileLegth = tempFile.GetLength() - 1;
-	cout << "file length" << fileLegth << endl;
-	Schema s("catalog","region");
+	//cout << "file length" << fileLegth << endl;
+
+
+/*
+
+test code
+
+*/
+
+
+/*
+
+	DBFile t;
+	t.Open("phase1.bin");
+	t.MoveFirst();
+	Record x;
+	int tcount=0;
+	while(t.GetNext(x)==1)
+		tcount++;
+	cout<<"this is to find the fucker <<"<<tcount<<endl<<endl;
+
+
+*/
+
+
+
+
+
+
 
 	if (totalrun == 1) {
 
@@ -232,7 +275,6 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 			Record *tempRecord = new Record();
 
 			while (page->GetFirst(tempRecord)) {
-				//tempRecord->Print(&s);
 				outPipe->Insert(tempRecord);
 			}
 			delete tempRecord;
@@ -267,7 +309,12 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 		Record *copyRecord;
 		while (true) {
 			int minIndex = min_element(recordVector.begin(), recordVector.end(),
-					sortFunc) - recordVector.begin();
+					myObject) - recordVector.begin();
+			if(recordVector[minIndex]==NULL)
+			{
+				//cout<<"caught u mother fucker"<<endl;
+				break;
+			}
 			outPipe->Insert(recordVector[minIndex]);
 			delete recordVector[minIndex];
 			copyRecord = new Record();
@@ -283,10 +330,10 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 				//cout<<"countcheck"<< countCheck<<"min index"<<minIndex<<endl;
 				//cout<<"run length"<<runLength<<endl;
 
-
+				//cout<<"indiPageCount["<<minIndex<<"]="<<indiPageCount[minIndex]<<endl;
 				if (indiPageCount[minIndex] <= countCheck) {
 					int offset = (minIndex * runLength) + indiPageCount[minIndex];
-					//cout<<"offset value"<<offset<<"indiPageCount["<<minIndex<<"]"<<indiPageCount[minIndex]<<endl;
+				//cout<<"offset value"<<offset<<"indiPageCount["<<minIndex<<"]"<<indiPageCount[minIndex]<<endl;
 					tempFile.GetPage(pageVector[minIndex], offset);
 					pageVector[minIndex]->GetFirst(tmpRecord);
 					copyRecord->Copy(tmpRecord);
@@ -294,10 +341,11 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 				}
 				else
 				{
+				//	cout<<"in else"<<endl;
 					recordVector[minIndex]=NULL;
 					nullCounter++;
+					//cout<<"null counter "<<nullCounter<<endl<<endl;
 				}
-
 
 			} else {
 				copyRecord->Copy(tmpRecord);
@@ -308,12 +356,12 @@ void mergeRuns(int runLength, int totalrun, char *f_path, Pipe *outPipe) {
 				break;
 		}
 
-
 	}
 
-	for(int i=0;i<pageVector.size();i++)
+for(int i=0;i<pageVector.size();i++)
 		delete pageVector[i];
 
-	outPipe->ShutDown();
-
+outPipe->ShutDown();
+tempFile.Close();
+remove(f_path);
 }

@@ -73,6 +73,8 @@ public:
 	
 	
 	int ComposeNewRecord (Schema *mySchema, const char *src);
+ 
+	int numOfAttributeInRecord();
 };
 
 #endif

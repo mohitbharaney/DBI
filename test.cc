@@ -10,7 +10,7 @@ Attribute DA = {"double", Double};
 int clear_pipe (Pipe &in_pipe, Schema *schema, bool print) {
 	Record rec;
 	int cnt = 0;
-	cout<<"in clear pipe"<<endl;
+	//cout<<"in clear pipe"<<endl;
 	while (in_pipe.Remove (&rec)) {
 		//cout<<"in while loop clear_pipe"<<endl;
 		if (print) {
@@ -209,12 +209,15 @@ void q4 () {
 	J.Run (_s, _ps, _s_ps, cnf_p_ps, lit_p_ps);
 	T.Run (_s_ps, _out, func);
 
-	SF_ps.WaitUntilDone ();
-	J.WaitUntilDone ();
-	T.WaitUntilDone ();
+
+
+
 
 	Schema sum_sch ("sum_sch", 1, &DA);
 	int cnt = clear_pipe (_out, &sum_sch, true);
+	SF_ps.WaitUntilDone ();
+	J.WaitUntilDone ();
+	T.WaitUntilDone ();
 	cout << " query4 returned " << cnt << " recs \n";
 }
 
@@ -296,13 +299,15 @@ void q6 () {
 	J.Run (_s, _ps, _s_ps, cnf_p_ps, lit_p_ps);
 	G.Run (_s_ps, _out, grp_order, func);
 
+	Schema sum_sch ("sum_sch", 1, &DA);
+	int cnt = clear_pipe (_out, &sum_sch, true);
+	cout << " query6 returned sum for " << cnt << " groups (expected 25 groups)\n"; 
+	
+	
 	SF_ps.WaitUntilDone ();
 	J.WaitUntilDone ();
 	G.WaitUntilDone ();
 
-	Schema sum_sch ("sum_sch", 1, &DA);
-	int cnt = clear_pipe (_out, &sum_sch, true);
-	cout << " query6 returned sum for " << cnt << " groups (expected 25 groups)\n"; 
 }
 
 void q7 () { 

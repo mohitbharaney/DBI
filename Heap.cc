@@ -12,8 +12,7 @@
 #include <fstream>
 #include "Heap.h"
 
-char heapMetaDataFileName[140];
-char tempFile[150];
+
 // stub file .. replace it with your own DBFile.cc
 Heap::Heap() {
 	//metaDataFileName = "metaData.txt";
@@ -37,7 +36,7 @@ int Heap::Create(char *f_path, fType f_type, void *startup) {
 
 		strcpy(&heapMetaDataFileName[0], &fileName[0]);
 		strcpy(&tempFile[0],&fileName[0]);
-		cout<<"in open:" <<heapMetaDataFileName<<endl;
+		//cout<<"in open:" <<heapMetaDataFileName<<endl;
 		/*
 		 extract file name and convert it to fileName.md for the metaData file
 		 */
@@ -111,7 +110,7 @@ int Heap::Open(char *f_path) {
 //	cout<<"in open function call for :";
 //	cout<<"file name:"<<f_path<<endl;
 //	cout<<"md file name error :" <<heapMetaDataFileName;
-strcpy(&heapMetaDataFileName[0],&fileName[0]);
+strcpy(&heapMetaDataFileName[0],(char*)fileName.c_str());
 
 		ifstream mdFile(heapMetaDataFileName);
 		string line;
@@ -141,9 +140,9 @@ strcpy(&heapMetaDataFileName[0],&fileName[0]);
 			pch = strtok(NULL, " ");
 			writePage = atoi(pch);	//convert char* to int
 
-			cout << "readPage " << readPage << endl;
-			cout << "readRecord " << readRecord << endl;
-			cout << "writePage " << writePage << endl;
+//			cout << "readPage " << readPage << endl;
+//			cout << "readRecord " << readRecord << endl;
+//			cout << "writePage " << writePage << endl;
 
 			// cout<<"exiting open"<<endl;
 			mdFile.close();
@@ -172,10 +171,10 @@ int Heap::Close() {
 
 	dbFile.Close();
 	ofstream mdFile;
-cout<<"in close function";
-cout<<heapMetaDataFileName<<endl;
+//cout<<"in close function";
+//cout<<heapMetaDataFileName<<endl;
 	mdFile.open(heapMetaDataFileName);
-	cout << "in close readPage: " << readPage << endl;
+	//cout << "in close readPage: " << readPage << endl;
 	mdFile << "heap" << endl;
 	mdFile << "readPage " << readPage << endl;
 	//cout<<"readRecord: "<<readRecord<<endl;
@@ -231,7 +230,7 @@ int Heap::GetNext(Record & fetchme) {
 		int noOfPages = dbFile.GetLength() - 1;
 		if (readPage + 1 < noOfPages) {
 			readRecord = 0;
-			cout << "readPage " << readPage << endl;
+		//	cout << "readPage " << readPage << endl;
 			readPage = readPage + 1;
 			dbFile.GetPage(rwBuffer, readPage);
 			rwBuffer->GetFirst(&fetchme);
@@ -259,6 +258,6 @@ int Heap::GetNext(Record & fetchme, CNF & cnf, Record & literal) {
 }
 
 Heap::~Heap() {
-	delete rwBuffer;
+//	delete rwBuffer;
 }
 

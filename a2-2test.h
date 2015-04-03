@@ -1,5 +1,5 @@
-#ifndef TEST_H
-#define TEST_H
+#ifndef A2-2TEST_H
+#define A2-2TEST_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -13,8 +13,8 @@ using namespace std;
 // make sure that the information below is correct
 
 char *catalog_path = "catalog"; 
-char *dbfile_dir = "/home/mugdha/Documents/gitProj/DBI/";
-char *tpch_dir="/home/mugdha/Documents/gitProj/DBI/10M/";
+char *dbfile_dir = "./";
+char *tpch_dir="/home/mugdha/Desktop/finalCOde/Assignment3/10M/";
 
 
 extern "C" {

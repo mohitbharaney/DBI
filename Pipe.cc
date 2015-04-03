@@ -3,6 +3,30 @@
 #include <iostream> 
 #include <stdlib.h>
 
+Pipe :: Pipe () {
+       int bufferSize=100;
+                // set up the mutex assoicated with the pipe
+       pthread_mutex_init (&pipeMutex, NULL);
+
+       // set up the condition variables associated with the pipe
+       pthread_cond_init (&producerVar, NULL);
+       pthread_cond_init (&consumerVar, NULL);
+
+       // set up the pipe's buffer
+       buffered = new (std::nothrow) Record[bufferSize];
+       if (buffered == NULL)
+       {
+               cout << "ERROR : Not enough memory. EXIT !!!\n";
+               exit(1);
+       }
+
+       totSpace = bufferSize;
+       firstSlot = lastSlot = 0;
+
+       // note that the pipe has not yet been turned off
+       done = 0;
+}
+
 Pipe :: Pipe (int bufferSize) {
 
 	// set up the mutex assoicated with the pipe
@@ -129,31 +153,4 @@ void Pipe :: ShutDown () {
 	// unlock the mutex
 	pthread_mutex_unlock (&pipeMutex);
 	
-}
-
-
-
-Pipe :: Pipe () {
-
-	int bufferSize=100;
-	// set up the mutex assoicated with the pipe
-	pthread_mutex_init (&pipeMutex, NULL);
-
-	// set up the condition variables associated with the pipe
-	pthread_cond_init (&producerVar, NULL);
-	pthread_cond_init (&consumerVar, NULL);
-
-	// set up the pipe's buffer
-	buffered = new (std::nothrow) Record[bufferSize];
-	if (buffered == NULL)
-	{
-		cout << "ERROR : Not enough memory. EXIT !!!\n";
-		exit(1);
-	}
-
-	totSpace = bufferSize;
-	firstSlot = lastSlot = 0;
-
-	// note that the pipe has not yet been turned off
-	done = 0;
 }

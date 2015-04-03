@@ -21,11 +21,12 @@ class DBFile {
 //	Page *rwBuffer;
 //	File dbFile;
 ////	char *metaDataFileName;
-	char metaDataFileName[40];
+	char metaDataFileName[140];
 
 
 public:
 	DBFile (); 
+	GenericDB *genericFile;
 
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);

@@ -15,14 +15,22 @@
 
 
 static void *selectPipeMethod(void *);
-static void *selectFileMethod(void *);
-static void *projectMethod(void *);
+ 
+void *selectFileMethod(void *);
+
+void *projectMethod(void *);
 static void *writeOutMethod(void *);
 static void *joinMethod(void *);
 static void *sumMethod(void *);
+
 static void *groupByMethod(void *);
+static void *createSortedData4grpBy(void *);
+
+
 static void *duplicateRemovalMethod(void *);
-static void *createSortedDataBigQ(void *);
+void *sortLeftMethod(void* arg);
+void *sortRightMethod(void* arg);
+void *joinMethod(void* arg);
 
 class RelationalOp {
 	public:
@@ -83,40 +91,56 @@ class Project : public RelationalOp {
 class Join : public RelationalOp { 
 	private:
 	pthread_t joinThread;
-	
+
 	public:
+
+	pthread_t sortLeft;
+	pthread_t sortRight;
+	int pipeSiez = 100; // buffer sz allowed for each pipe
 	Pipe *inputPipeL,*inputPipeR, *outputPipe;
+	Pipe *sortedLeft;
+	Pipe *sortedRight;
+	OrderMaker leftSortOrder,rightSortOrder;
+	//pipe to be used in join after sorting the data out.
 	Record *literalRecord;
 	CNF *selectOp;
-	
+	int runLength;
+	ComparisonEngine smjCmp;
 	void Run (Pipe &inPipeL, Pipe &inPipeR, Pipe &outPipe, CNF &selOp, Record &literal);
 	void WaitUntilDone ();
-	void Use_n_Pages (int n) { }
+	void Use_n_Pages (int n);// { }
 };
 class DuplicateRemoval : public RelationalOp {
-	
-	private:
-	pthread_t duplicateRemovalThread;
-	pthread_t bigQThread;
-	
-	public:
-	
-	
-	Pipe *inputPipeDupliRemoval;
-	Pipe *outPipeDupliRemoval;
-	Schema *schemaDupliRemoval;
-	
-	int dupliRunLength;
-	
-	BigQ *bigQ_obj;
-	Pipe tempBigQ;
-	DuplicateRemoval():tempBigQ(100);
-	 
-	void Run (Pipe &inPipe, Pipe &outPipe, Schema &mySchema);
-	void WaitUntilDone ();
-	void Use_n_Pages (int n);
-	//~DuplicateRemoval() {}
+
+       private:
+       pthread_t duplicateRemovalThread;
+       pthread_t bigQThread;
+
+       public:
+
+
+       Pipe *inputPipeDupliRemoval;
+       Pipe *outPipeDupliRemoval;
+       Schema *schemaDupliRemoval;
+
+       int dupliRunLength;
+
+       BigQ *bigQ_obj;
+       Pipe tempBigQ;
+       DuplicateRemoval()
+       {
+       //tempBigQ=Pipe(100);
+       Pipe(100);
+       }
+
+       void Run (Pipe &inPipe, Pipe &outPipe, Schema &mySchema);
+       void WaitUntilDone ();
+       void Use_n_Pages (int n);
+       //~DuplicateRemoval() {}
 };
+static void *duplicateRemovalMethod(void *);
+static void *createSortedDataBigQ(void *);
+
 class Sum : public RelationalOp {
 	private:
 	pthread_t sumThread;
@@ -133,16 +157,30 @@ class GroupBy : public RelationalOp {
 	
 	private:
 	pthread_t groupByThread;
+	pthread_t bigQThread;
 	
 	public:
 	Pipe *inputPipeGrpBy;
 	Pipe *outPipeGrpBy;
 	OrderMaker *ordermakerGrpBy;
 	Function *computeMeGrpBy;
-	void Run (Pipe &inPipe, Pipe &outPipe, OrderMaker &groupAtts, Function &computeMe) {}
-	void WaitUntilDone () {}
-	void Use_n_Pages (int n) { }
+		
+	BigQ *bigQObj;
+	Pipe tempBigQ_pipe;
+	
+	int runLengthGrpBy;
+	
+	GroupBy()
+	{	
+	//tempBigQ=Pipe(100);
+	Pipe(100);
+	}
+	
+	void Run (Pipe &inPipe, Pipe &outPipe, OrderMaker &groupAtts, Function &computeMe);
+	void WaitUntilDone ();
+	void Use_n_Pages (int n);
 };
+
 
 class WriteOut : public RelationalOp {
 

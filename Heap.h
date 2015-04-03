@@ -23,7 +23,8 @@ class Heap : public  GenericDB{
 
 public:
 	Heap ();
-
+	char heapMetaDataFileName[140];
+	char tempFile[150];
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);
 	int Close ();

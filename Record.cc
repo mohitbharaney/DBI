@@ -520,12 +520,11 @@ delete [] rSpace;
 return 1;
 
 } 
-
+int Record::numOfAttributeInRecord(){
+	int att=*((int*)bits +1);
+	return ((att - sizeof(int))/sizeof(int));
+	}
  
-
-
-
-
 
 
 
