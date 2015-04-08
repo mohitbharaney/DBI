@@ -104,6 +104,15 @@ void OrderMaker::Print() {
 	}
 }
 
+
+int OrderMaker :: numOfAtts(){
+	return numAtts;
+}
+int* OrderMaker :: attsList(){
+	return whichAtts;
+}
+
+
 char* OrderMaker::toString() {
 
 	//cout<<"in toString"<<endl;
@@ -181,7 +190,7 @@ int CNF::createQuery(OrderMaker& sortOrder, OrderMaker& output) {
 		return 0;
 
 }
-
+//created by me for query .
 int CNF::GetSortOrders(OrderMaker &left) {
 	// initialize the size of the OrderMakers
 	left.numAtts = 0;

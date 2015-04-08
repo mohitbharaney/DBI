@@ -1,7 +1,4 @@
-sorted
-readPage 2
-readRecord 25
+heap
+readPage 1
+readRecord 0
 writePage 1
-1
-1 
-2 

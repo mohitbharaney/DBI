@@ -1,7 +1,4 @@
-sorted
-readPage 100
-readRecord 438
+heap
+readPage 1
+readRecord 0
 writePage 99
-1
-0 
-0 

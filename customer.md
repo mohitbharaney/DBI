@@ -1,4 +1,4 @@
 heap
-readPage 3
-readRecord 220
+readPage 1
+readRecord 0
 writePage 3

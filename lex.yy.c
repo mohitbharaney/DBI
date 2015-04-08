@@ -528,6 +528,10 @@ char *yytext_ptr;
 int lineno = 1;
 void yyerror(char*s);
 
+static YY_BUFFER_STATE yylex_buf_state;
+void init_lexical_parser (char *src) { yylex_buf_state = yy_scan_string (src); }
+void close_lexical_parser () { yy_delete_buffer (yylex_buf_state); }
+
 /******************************************************************************
  * SECTION 2
  ******************************************************************************/
@@ -540,7 +544,7 @@ void yyerror(char*s);
 /* This is the RULES section which defines how to "scan" and what action
  * to take for each token
  */
-#line 544 "lex.yy.c"
+#line 548 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -722,10 +726,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 36 "Lexer.l"
+#line 40 "Lexer.l"
 
 
-#line 729 "lex.yy.c"
+#line 733 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -829,56 +833,56 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 38 "Lexer.l"
+#line 42 "Lexer.l"
 return('(');
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 40 "Lexer.l"
+#line 44 "Lexer.l"
 return(')');
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 42 "Lexer.l"
+#line 46 "Lexer.l"
 return('<');
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 44 "Lexer.l"
+#line 48 "Lexer.l"
 return('>');
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 46 "Lexer.l"
+#line 50 "Lexer.l"
 return('=');
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 48 "Lexer.l"
+#line 52 "Lexer.l"
 {yylval.actualChars = strdup(yytext);
   			return(Int); 
 		        }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 52 "Lexer.l"
+#line 56 "Lexer.l"
 {yylval.actualChars = strdup(yytext); 
   			return(Float);
 			}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 56 "Lexer.l"
+#line 60 "Lexer.l"
 return(OR);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 58 "Lexer.l"
+#line 62 "Lexer.l"
 return(AND);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "Lexer.l"
+#line 64 "Lexer.l"
 {/* take care of ' in a string */
 	 		if (yytext[yyleng - 2] == '\\') {
      				yymore();
@@ -891,7 +895,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 70 "Lexer.l"
+#line 74 "Lexer.l"
 {yylval.actualChars = strdup(yytext);
   			return(Name);
 			}     
@@ -899,25 +903,25 @@ YY_RULE_SETUP
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 74 "Lexer.l"
+#line 78 "Lexer.l"
 lineno++;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 76 "Lexer.l"
+#line 80 "Lexer.l"
 ;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 78 "Lexer.l"
+#line 82 "Lexer.l"
 yyerror("LEX_ERROR: invalid character");
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 80 "Lexer.l"
+#line 84 "Lexer.l"
 ECHO;
 	YY_BREAK
-#line 921 "lex.yy.c"
+#line 925 "lex.yy.c"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 
@@ -1897,7 +1901,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 80 "Lexer.l"
+#line 84 "Lexer.l"
 
 
 

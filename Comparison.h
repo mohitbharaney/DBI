@@ -63,6 +63,8 @@ public:
 	// print to the screen
 	void Print ();
 
+	int* attsList();
+	int numOfAtts();
 	char* toString();
 	void setAtrr(int numAtts,int whichAtts[MAX_ANDS],int whichTypes[MAX_ANDS]);
 

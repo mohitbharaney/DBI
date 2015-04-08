@@ -16,7 +16,7 @@
 
 // stub file .. replace it with your own DBFile.cc
 
-GenericDB *genericFile;
+
 
 DBFile::DBFile ()
 {
@@ -106,7 +106,7 @@ strcpy(&metaDataFileName[0],&fileName[0]);
 	}
       else
       {
-    	  cout<<"check if file exists else u are screwed"<<endl;
+    	  cout<<"check if file exists "<<endl;
     	  return 0;
       }
 

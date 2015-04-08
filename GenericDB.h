@@ -16,7 +16,7 @@ typedef enum {heap, sorted, tree} fType;
 class GenericDB {
 
 public:
-
+	char metaDataFileName[140];
 	GenericDB();
 	virtual int Create (char *fpath, fType file_type, void *startup);
 	virtual int Open (char *fpath);

@@ -12,7 +12,8 @@ using namespace std;
 // make sure that the information below is correct
 
 char *catalog_path = "catalog"; 
-char *tpch_dir ="/home/mohit/uf/spring_2015/dbi/10M/";
+//char *tpch_dir="/home/mugdha/Desktop/finalCOde/Assignment3/10M/";
+char* tpch_dir="/home/mohit/uf/spring_2015/dbi/10M/";
 char *dbfile_dir = ""; 
 
 
